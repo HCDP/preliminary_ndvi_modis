@@ -29,7 +29,7 @@ def get_window_from_date(date):
     linked = modis.linkCollection(ee.ImageCollection("MODIS/061/MOD09GA"), ["state_1km"])
     bounded = linked.filterBounds(HI_STATE_GEOMETRY)
     sorted = bounded.sort('system:time_start', False)
-    limited = bounded.filterDate(ee_date_start, ee_date)
+    limited = sorted.filterDate(ee_date_start, ee_date)
     if limited.size().getInfo() < WINDOW_SIZE:
         limited = sorted.limit(WINDOW_SIZE)
     return limited
@@ -46,6 +46,9 @@ if date == today:
    modis = get_last_window()
 else:
     modis = get_window_from_date(date)
+
+#get first image date and format as the aggregation date
+agg_date_str = modis.first().date().format("YYYY-MM-dd").getInfo()
 
 # Cloud masking function
 def maskMODISclouds(image):
@@ -74,6 +77,6 @@ filled = withNdvi.map(fill)
 medians = filled.median()
 ndvi = medians.select('ndvi')
 
-outpath = f"./ndvi_statewide.tif"
+outpath = f"./ndvi_statewide_{agg_date_str}.tif"
 
 geemap.ee_export_image(ndvi, filename = outpath, scale = 250, region = HI_STATE_GEOMETRY)
