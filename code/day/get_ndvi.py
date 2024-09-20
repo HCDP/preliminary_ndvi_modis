@@ -1,11 +1,11 @@
 import geemap ### package for google earth engine analysis 
 import ee ### packge neccsary for using geemap
-from os import makedirs, environ
+from os import makedirs, environ, system
 import datetime
 from sys import argv
 from os.path import join
 
-WINDOW_SIZE = 16
+WINDOW_SIZE = 30
 
 # get credentials and initialize ee and geemap
 credentials = ee.ServiceAccountCredentials(environ["GEE_SERVICE_ACCOUNT"], environ["GEE_CREDENTIALS"])
@@ -78,7 +78,12 @@ filled = withNdvi.map(fill)
 medians = filled.median()
 ndvi = medians.select('ndvi')
 
-outpath = join(environ["OUT_DIR"], f"ndvi_statewide_{agg_date_str}.tif")
-makedirs(environ["OUT_DIR"], exist_ok = True)
+outdir = join(environ["PROJECT_ROOT"], "data_outputs/raw")
+outfile = join(outdir, f"ndvi_statewide_{agg_date_str}.tif")
+makedirs(outdir, exist_ok = True)
 
-geemap.ee_export_image(ndvi, filename = outpath, scale = 250, region = HI_STATE_GEOMETRY)
+dateenv = join(environ["PROJECT_ROOT"], "envs", "date.env")
+with open(dateenv, "w") as f:
+    f.write(f"export CUSTOM_DATE={agg_date_str}")
+
+geemap.ee_export_image(ndvi, filename = outfile, scale = 250, region = HI_STATE_GEOMETRY)
