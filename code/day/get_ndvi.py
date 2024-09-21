@@ -5,7 +5,7 @@ import datetime
 from sys import argv
 from os.path import join
 
-WINDOW_SIZE = 30
+WINDOW_SIZE = 16
 
 # get credentials and initialize ee and geemap
 credentials = ee.ServiceAccountCredentials(environ["GEE_SERVICE_ACCOUNT"], environ["GEE_CREDENTIALS"])
