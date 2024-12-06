@@ -79,7 +79,7 @@ medians = filled.median()
 ndvi = medians.select('ndvi')
 
 outdir = join(environ["PROJECT_ROOT"], "data_outputs/raw")
-outfile = join(outdir, f"ndvi_statewide_{agg_date_str}.tif")
+outfile = join(outdir, f"ndvi_statewide.tif")
 makedirs(outdir, exist_ok = True)
 
 dateenv = join(environ["PROJECT_ROOT"], "envs", "date.env")
