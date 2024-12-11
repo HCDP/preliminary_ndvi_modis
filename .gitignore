@@ -1,3 +1,4 @@
 **/*credentials.json
 **/*.tif
 envs/date.env
+data_outputs/*
