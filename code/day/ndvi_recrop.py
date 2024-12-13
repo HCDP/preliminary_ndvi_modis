@@ -1,49 +1,50 @@
-import os
 import rasterio
-from rasterio.enums import Resampling
-from rasterio.mask import mask
-import numpy as np
+from rasterio.warp import reproject, Resampling, calculate_default_transform
+import numpy.ma as ma
+from os import environ, makedirs
+from os.path import join
 
-# Get daily ndvi
-os.chdir("dir/raw")
-ndvi_tiffs = [f for f in os.listdir() if f.startswith("ndvi_statewide_")]
-with rasterio.open(ndvi_tiffs[-1]) as src:
-    ndvi = src.read(1)
+def mask_and_reproject(ndvi_file, mask_file, out_file):
+    #open NDVI source file and mask
+    with rasterio.open(ndvi_file) as src, rasterio.open(mask_file) as mask:
+        #get source transform
+        src_transform = src.transform
+        #get mask projection
+        dst_crs = mask.crs
+        
+        #calculate the output transform matrix
+        dst_transform, dst_width, dst_height = calculate_default_transform(src.crs, dst_crs, mask.width, mask.height, *mask.bounds)
 
-# Get mask raster
-os.chdir("dir/masks")
-hi_mask = rasterio.open("hi_mask.tif")
-bi_mask = rasterio.open("bi_mask.tif")
-mn_mask = rasterio.open("mn_mask.tif")
-oa_mask = rasterio.open("oa_mask.tif")
-ka_mask = rasterio.open("ka_mask.tif")
+        #copy source metadata and update with destination properties
+        dst_meta = src.meta.copy()
+        dst_meta.update({
+            "crs": dst_crs,
+            "transform": dst_transform,
+            "width": dst_width,
+            "height": dst_height,
+            "nodata": mask.nodata
+        })
+        
+        #open destination file with metadata
+        with rasterio.open(out_file, "w+", **dst_meta) as dst:
+            #reproject source NDVI into destination file with bilinear sampling and computed properties
+            reproject(source = rasterio.band(src, 1), destination = rasterio.band(dst, 1), src_transform = src.transform, src_crs = src.crs, dst_transform = dst_transform, dst_crs = dst_crs, resampling = Resampling.bilinear)
+            #read data from reprojection
+            dst_data = dst.read(1)
+            #mask nodata values from mask
+            mask_data = mask.read(1, masked = True).mask
+            masked_data = ma.masked_array(dst_data, mask = mask_data)
+            #write data back to file
+            dst.write(masked_data, indexes = 1)
 
-# Resample and mask input ndvi
-ndvi_re = ndvi  # need resample to align ndvi grid to hi_mask (statewide mask)
-ndvi_hi, _ = mask(hi_mask, [hi_mask.read(1)], crop=True)
+project_root = environ["PROJECT_ROOT"]
+src_file = join(project_root, f"data_outputs/raw/ndvi_statewide.tif")
 
-# Crop ndvi hi to each county mask
-ndvi_bi, _ = mask(bi_mask, [ndvi_hi], crop=True)
-ndvi_mn, _ = mask(mn_mask, [ndvi_hi], crop=True)
-ndvi_oa, _ = mask(oa_mask, [ndvi_hi], crop=True)
-ndvi_ka, _ = mask(ka_mask, [ndvi_hi], crop=True)
+outdir = join(project_root, "data_outputs/processed")
+makedirs(outdir, exist_ok = True)
 
-# Write final rasters as geo tiffs
-os.chdir("dir/out")
-with rasterio.open("statewide/ndvi/ndvi_hi.tif", 'w', driver='GTiff', height=ndvi_hi.shape[0], width=ndvi_hi.shape[1], count=1, dtype=ndvi_hi.dtype) as dst:
-    dst.write(ndvi_hi, 1)
-
-with rasterio.open("county/BI/ndvi/ndvi_bi.tif", 'w', driver='GTiff', height=ndvi_bi.shape[0], width=ndvi_bi.shape[1], count=1, dtype=ndvi_bi.dtype) as dst:
-    dst.write(ndvi_bi, 1)
-
-with rasterio.open("county/MN/ndvi/ndvi_mn.tif", 'w', driver='GTiff', height=ndvi_mn.shape[0], width=ndvi_mn.shape[1], count=1, dtype=ndvi_mn.dtype) as dst:
-    dst.write(ndvi_mn, 1)
-
-with rasterio.open("county/OA/ndvi/ndvi_oa.tif", 'w', driver='GTiff', height=ndvi_oa.shape[0], width=ndvi_oa.shape[1], count=1, dtype=ndvi_oa.dtype) as dst:
-    dst.write(ndvi_oa, 1)
-
-with rasterio.open("county/KA/ndvi/ndvi_ka.tif", 'w', driver='GTiff', height=ndvi_ka.shape[0], width=ndvi_ka.shape[1], count=1, dtype=ndvi_ka.dtype) as dst:
-    dst.write(ndvi_ka, 1)
-
-# Code pau
-
+extents = ["hi", "bi", "mn", "oa", "ka"]
+for extent in extents:
+    out_file = join(outdir, f"data_outputs/processed/{extent}.tif")
+    mask_file = join(project_root, f"dependencies/{extent}_mask.tif")
+    mask_and_reproject(src_file, mask_file, out_file)

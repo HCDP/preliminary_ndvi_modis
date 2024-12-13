@@ -4,12 +4,21 @@ from os import makedirs, environ, system
 import datetime
 from sys import argv
 from os.path import join
+import json
 
 WINDOW_SIZE = 16
 
+gee_cred_file = environ["GEE_CREDENTIALS"]
+gee_project_id = None
+service_account = None
+with open(gee_cred_file) as f:
+    config = json.load(f)
+    gee_project_id = config["project_id"]
+    service_account = config["client_email"]
+
 # get credentials and initialize ee and geemap
-credentials = ee.ServiceAccountCredentials(environ["GEE_SERVICE_ACCOUNT"], environ["GEE_CREDENTIALS"])
-ee.Initialize(credentials, project = environ["GC_PROJECT"])
+credentials = ee.ServiceAccountCredentials(service_account, gee_cred_file)
+ee.Initialize(credentials, project = gee_project_id)
 geemap.ee_initialize()
 
 HI_STATE_GEOMETRY = ee.Geometry.Polygon([[[-154.668, 18.849], [-154.668, 22.269], [-159.816, 22.269], [-159.816, 18.849]]])
@@ -87,4 +96,3 @@ with open(dateenv, "w") as f:
     f.write(f"export CUSTOM_DATE={agg_date_str}")
 
 geemap.ee_export_image(ndvi, filename = outfile, scale = 250, region = HI_STATE_GEOMETRY)
->>>>>>> 7e0b313c52f5bff2cfcea0f2decabcccc452019d

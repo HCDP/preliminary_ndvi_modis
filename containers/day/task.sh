@@ -20,14 +20,16 @@ echo "--- end get_ndvi.py ---"
 source envs/date.env
 echo "NDVI aggregation date is: " $CUSTOM_DATE
 
-echo "[task.sh] [3/5] NDVI processing."
-# INSERT NDVI PROCESSING SCRIPT CALL HERE
+echo "[task.sh] [3/5] Mask, reproject, and split into counties."
+echo "--- start ndvi_recrop.py ---"
+python3 -u code/day/ndvi_recrop.py
+echo "--- end ndvi_recrop.py ---"
 
 echo "[task.sh] [4/5] Preparing to upload data."
-# cd /sync
-# python3 inject_upload_config.py config.json $CUSTOM_DATE
+cd /sync
+python3 inject_upload_config.py config.json $CUSTOM_DATE
 
 echo "[task.sh] [5/5] Uploading data."
-# python3 upload.py
+python3 upload.py
 
 echo "[task.sh] All done!"
