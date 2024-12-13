@@ -18,6 +18,5 @@ RUN mkdir -p /sync
 
 RUN wget https://raw.githubusercontent.com/ikewai/data-uploader/main/upload.py -O /sync/upload.py
 
-ADD /gc-service-credentials/gee-credentials.json /gc-service-credentials
 ADD /tools /sync
 ADD /envs/prod.env /workspace/envs

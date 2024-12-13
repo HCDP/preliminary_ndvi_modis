@@ -18,8 +18,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    - name: add config
-      run: echo "${{ secrets.GEE_CREDENTIALS_JSON }}" | base64 -d >> gc-service-credentials/gee-credentials.json
     - name: Set container name
       run: echo "CONTAINER_NAME=task-preliminary-ndvi-modis-daily" >> $GITHUB_ENV
     - name: Get date and hash
