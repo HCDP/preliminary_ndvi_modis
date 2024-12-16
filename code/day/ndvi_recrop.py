@@ -45,6 +45,6 @@ makedirs(outdir, exist_ok = True)
 
 extents = ["hi", "bi", "mn", "oa", "ka"]
 for extent in extents:
-    out_file = join(outdir, f"data_outputs/processed/{extent}.tif")
+    out_file = join(outdir, f"{extent}.tif")
     mask_file = join(project_root, f"dependencies/{extent}_mask.tif")
     mask_and_reproject(src_file, mask_file, out_file)
