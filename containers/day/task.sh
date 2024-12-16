@@ -14,7 +14,7 @@ source envs/prod.env
 
 echo "[task.sh] [2/5] Getting NDVI data from GEE."
 echo "--- start get_ndvi.py ---"
-python3 -u code/day/get_ndvi.py $CUSTOM_DATE
+python3 -u code/get_ndvi.py $CUSTOM_DATE
 echo "--- end get_ndvi.py ---"
 
 source envs/date.env
@@ -22,7 +22,7 @@ echo "NDVI aggregation date is: " $CUSTOM_DATE
 
 echo "[task.sh] [3/5] Mask, reproject, and split into counties."
 echo "--- start ndvi_recrop.py ---"
-python3 -u code/day/ndvi_recrop.py
+python3 -u code/ndvi_recrop.py
 echo "--- end ndvi_recrop.py ---"
 
 echo "[task.sh] [4/5] Preparing to upload data."
