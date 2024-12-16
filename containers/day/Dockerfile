@@ -9,7 +9,7 @@ RUN rm daily_dependencies.tar.gz
 
 ADD /code/day /workspace/code
 # Get the container's upload config as specified in the code repo.
-ADD /containers/day/configs/upload.json /sync
+ADD /containers/day/configs/upload.json /sync/config.json
 # Add the task wrapper script.
 ADD /containers/day/task.sh /workspace/task.sh
 
