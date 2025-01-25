@@ -1,6 +1,6 @@
 **/*credentials.json
 **/*.tif
 envs/date.env
-data_outputs/*
+data_outputs
 dependencies
 gee-credentials

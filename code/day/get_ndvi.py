@@ -23,42 +23,34 @@ geemap.ee_initialize()
 
 HI_STATE_GEOMETRY = ee.Geometry.Polygon([[[-154.668, 18.849], [-154.668, 22.269], [-159.816, 22.269], [-159.816, 18.849]]])
 
-def get_last_window():
-    modis = ee.ImageCollection('MODIS/061/MOD09GQ')
-    linked = modis.linkCollection(ee.ImageCollection("MODIS/061/MOD09GA"), ["state_1km"])
-    bounded = linked.filterBounds(HI_STATE_GEOMETRY)
-    sorted = bounded.sort('system:time_start', False)
-    limited = sorted.limit(WINDOW_SIZE)
-    return limited
-
 def get_window_from_date(date):
     date_s = date.strftime("%Y-%m-%d")
-    ee_date = ee.Date(date_s, "Pacific/Honolulu")
-    ee_date_start = ee_date.advance(-WINDOW_SIZE, 'day')
+    ee_date = ee.Date(date_s)
+    ee_date_start = ee.Date("1970-01-01")
     modis = ee.ImageCollection('MODIS/061/MOD09GQ')
     linked = modis.linkCollection(ee.ImageCollection("MODIS/061/MOD09GA"), ["state_1km"])
     bounded = linked.filterBounds(HI_STATE_GEOMETRY)
     sorted = bounded.sort('system:time_start', False)
-    limited = sorted.filterDate(ee_date_start, ee_date)
-    if limited.size().getInfo() < WINDOW_SIZE:
-        limited = sorted.limit(WINDOW_SIZE)
-    return limited
+    last_date = datetime.date.fromisoformat(sorted.first().date().format("YYYY-MM-dd").getInfo())
+    agg_date = date if date < last_date else last_date
+    date_bounded = sorted.filterDate(ee_date_start, ee_date)
+    limited = date_bounded.limit(WINDOW_SIZE)
+    return (agg_date, limited)
 
+# how to handle missing days that are filled
 
-today = datetime.date.today()
-date = datetime.date.today()
+#default to yesterday if no date provided
+date = datetime.date.today() - datetime.timedelta(days = 1)
 if len(argv) > 1:
     date = datetime.datetime.fromisoformat(argv[1]).date()
 
 modis = None
-#if date is today just grab the last 16 images
-if date == today:
-   modis = get_last_window()
-else:
-    modis = get_window_from_date(date)
+agg_date, modis = get_window_from_date(date)
 
 #get first image date and format as the aggregation date
-agg_date_str = modis.first().date().format("YYYY-MM-dd").getInfo()
+agg_date_str = agg_date.isoformat()
+
+print(f"Aggregating NDVI data for {agg_date_str}")
 
 # Cloud masking function
 def maskMODISclouds(image):

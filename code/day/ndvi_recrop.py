@@ -7,8 +7,6 @@ from os.path import join
 def mask_and_reproject(ndvi_file, mask_file, out_file):
     #open NDVI source file and mask
     with rasterio.open(ndvi_file) as src, rasterio.open(mask_file) as mask:
-        #get source transform
-        src_transform = src.transform
         #get mask projection
         dst_crs = mask.crs
         
