@@ -78,6 +78,7 @@ filled = withNdvi.map(fill)
 # Reduce to median values
 medians = filled.median()
 ndvi = medians.select('ndvi')
+ndvi.unmask(-9999)
 
 outdir = join(environ["PROJECT_ROOT"], "data_outputs/raw")
 outfile = join(outdir, f"ndvi_statewide.tif")
@@ -87,4 +88,4 @@ dateenv = join(environ["PROJECT_ROOT"], "envs", "date.env")
 with open(dateenv, "w") as f:
     f.write(f"export CUSTOM_DATE={agg_date_str}")
 
-geemap.ee_export_image(ndvi, filename = outfile, scale = 250, region = HI_STATE_GEOMETRY)
+geemap.ee_export_image(ndvi, filename = outfile, scale = 250, region = HI_STATE_GEOMETRY, formatOptions = { "COMPRESS": "LZW" })

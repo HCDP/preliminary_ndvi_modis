@@ -14,17 +14,16 @@ def mask_and_reproject(ndvi_file, mask_file, out_file):
         dst_transform, dst_width, dst_height = calculate_default_transform(src.crs, dst_crs, mask.width, mask.height, *mask.bounds)
 
         #copy source metadata and update with destination properties
-        dst_meta = src.meta.copy()
-        dst_meta.update({
+        dst_profile = src.profile.copy()
+        dst_profile.update({
             "crs": dst_crs,
             "transform": dst_transform,
             "width": dst_width,
-            "height": dst_height,
-            "nodata": mask.nodata
+            "height": dst_height
         })
         
         #open destination file with metadata
-        with rasterio.open(out_file, "w+", **dst_meta) as dst:
+        with rasterio.open(out_file, "w+", **dst_profile) as dst:
             #reproject source NDVI into destination file with bilinear sampling and computed properties
             reproject(source = rasterio.band(src, 1), destination = rasterio.band(dst, 1), src_transform = src.transform, src_crs = src.crs, dst_transform = dst_transform, dst_crs = dst_crs, resampling = Resampling.bilinear)
             #read data from reprojection
