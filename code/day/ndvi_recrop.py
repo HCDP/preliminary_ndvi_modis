@@ -9,9 +9,9 @@ def mask_and_reproject(ndvi_file, mask_file, out_file):
     with rasterio.open(ndvi_file) as src, rasterio.open(mask_file) as mask:
         #get mask projection
         dst_crs = mask.crs
-        
         #calculate the output transform matrix
         dst_transform, dst_width, dst_height = calculate_default_transform(src.crs, dst_crs, mask.width, mask.height, *mask.bounds)
+        nodata = mask.nodata
 
         #copy source metadata and update with destination properties
         dst_profile = src.profile.copy()
@@ -19,7 +19,9 @@ def mask_and_reproject(ndvi_file, mask_file, out_file):
             "crs": dst_crs,
             "transform": dst_transform,
             "width": dst_width,
-            "height": dst_height
+            "height": dst_height,
+            "nodata": nodata,
+            "compress": "lzw"
         })
         
         #open destination file with metadata
