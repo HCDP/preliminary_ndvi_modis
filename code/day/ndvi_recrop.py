@@ -21,7 +21,9 @@ def mask_and_reproject(ndvi_file, mask_file, out_file):
             "width": dst_width,
             "height": dst_height,
             "nodata": nodata,
-            "compress": "lzw"
+            "compress": "lzw",
+            "tiled": False,
+            "blockysize": 1
         })
         
         #open destination file with metadata
