@@ -50,8 +50,8 @@ def fill(image):
 
 def process_image(src, agg_date):
     for extent in EXTENTS:
-        outfile = f"ndvi_modis_day_{extent}_data_map_{agg_date.strftime("%Y_%m_%d")}.tif"
-        outdir = join(project_root, "data_outputs/processed", f"{extent}/data_map/{agg_date.strftime("%Y/%m")}/")
+        outfile = f"ndvi_modis_day_{extent}_data_map_{agg_date.strftime('%Y_%m_%d')}.tif"
+        outdir = join(project_root, "data_outputs/processed", f"{extent}/data_map/{agg_date.strftime('%Y/%m')}/")
         makedirs(outdir, exist_ok = True)
         outpath = join(outdir, outfile)
         mask_file = join(project_root, f"dependencies/{extent}_mask.tif")
@@ -74,7 +74,7 @@ def process_date(modis, geometry, agg_date):
     ndvi = medians.select('ndvi')
 
     outdir = join(project_root, "data_outputs/raw")
-    outfile = join(outdir, f"ndvi_statewide_{agg_date.strftime("%Y_%m_%d")}.tif")
+    outfile = join(outdir, f"ndvi_statewide_{agg_date.strftime('%Y_%m_%d')}.tif")
     makedirs(outdir, exist_ok = True)
     print("Creating raw NDVI from GEE")
     geemap.ee_export_image(ndvi, filename = outfile, scale = 250, region = geometry)
