@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "[task.sh] [1/5] Starting Execution."
+echo "[task.sh] [1/4] Starting Execution."
 export TZ="HST"
 echo "It is currently $(date)."
 if [ $CUSTOM_DATE ]; then
@@ -12,24 +12,16 @@ fi
 echo "Aggregation date is: " $CUSTOM_DATE
 source envs/prod.env
 
-echo "[task.sh] [2/5] Getting NDVI data from GEE."
+echo "[task.sh] [2/4] Getting NDVI data from GEE. Mask, reproject, and split into counties."
 echo "--- start get_ndvi.py ---"
 python3 -u code/get_ndvi.py $CUSTOM_DATE
 echo "--- end get_ndvi.py ---"
 
-source envs/date.env
-echo "NDVI aggregation date is: " $CUSTOM_DATE
-
-echo "[task.sh] [3/5] Mask, reproject, and split into counties."
-echo "--- start ndvi_recrop.py ---"
-python3 -u code/ndvi_recrop.py
-echo "--- end ndvi_recrop.py ---"
-
-echo "[task.sh] [4/5] Preparing to upload data."
+echo "[task.sh] [3/4] Preparing to upload data."
 cd /sync
 python3 inject_upload_config.py config.json $CUSTOM_DATE
 
-echo "[task.sh] [5/5] Uploading data."
+echo "[task.sh] [4/4] Uploading data."
 python3 upload.py
 
 echo "[task.sh] All done!"

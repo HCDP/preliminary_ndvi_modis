@@ -4,3 +4,4 @@ envs/date.env
 data_outputs
 dependencies
 gee-credentials
+**/__pycache__

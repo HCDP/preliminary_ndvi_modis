@@ -1,8 +1,6 @@
 import rasterio
 from rasterio.warp import reproject, Resampling, calculate_default_transform
 import numpy.ma as ma
-from os import environ, makedirs
-from os.path import join
 
 def mask_and_reproject(ndvi_file, mask_file, out_file):
     #open NDVI source file and mask
@@ -37,15 +35,3 @@ def mask_and_reproject(ndvi_file, mask_file, out_file):
             masked_data = ma.masked_array(dst_data, mask = mask_data)
             #write data back to file
             dst.write(masked_data, indexes = 1)
-
-project_root = environ["PROJECT_ROOT"]
-src_file = join(project_root, f"data_outputs/raw/ndvi_statewide.tif")
-
-outdir = join(project_root, "data_outputs/processed")
-makedirs(outdir, exist_ok = True)
-
-extents = ["hi", "bi", "mn", "oa", "ka"]
-for extent in extents:
-    out_file = join(outdir, f"{extent}.tif")
-    mask_file = join(project_root, f"dependencies/{extent}_mask.tif")
-    mask_and_reproject(src_file, mask_file, out_file)

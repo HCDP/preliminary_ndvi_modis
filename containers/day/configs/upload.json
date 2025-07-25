@@ -14,33 +14,8 @@
 	"upload":
 	[
         {
-            "local_path": "/workspace/data_outputs/processed/hi.tif",
-            "remote_path": "HCDP/production/ndvi_modis/day/statewide/data_map/%y/%m",
-            "rename": "ndvi_modis_day_statewide_data_map_%y_%m_%d.tif",
-            "system_id": "ikewai-annotated-data"
-        },
-        {
-            "local_path": "/workspace/data_outputs/processed/bi.tif",
-            "remote_path": "HCDP/production/ndvi_modis/day/bi/data_map/%y/%m",
-            "rename": "ndvi_modis_day_bi_data_map_%y_%m_%d.tif",
-            "system_id": "ikewai-annotated-data"
-        },
-        {
-            "local_path": "/workspace/data_outputs/processed/mn.tif",
-            "remote_path": "HCDP/production/ndvi_modis/day/mn/data_map/%y/%m",
-            "rename": "ndvi_modis_day_mn_data_map_%y_%m_%d.tif",
-            "system_id": "ikewai-annotated-data"
-        },
-        {
-            "local_path": "/workspace/data_outputs/processed/oa.tif",
-            "remote_path": "HCDP/production/ndvi_modis/day/oa/data_map/%y/%m",
-            "rename": "ndvi_modis_day_oa_data_map_%y_%m_%d.tif",
-            "system_id": "ikewai-annotated-data"
-        },
-        {
-            "local_path": "/workspace/data_outputs/processed/ka.tif",
-            "remote_path": "HCDP/production/ndvi_modis/day/ka/data_map/%y/%m",
-            "rename": "ndvi_modis_day_ka_data_map_%y_%m_%d.tif",
+            "local_path": "/workspace/data_outputs/processed/",
+            "remote_path": "HCDP/production/ndvi_modis/day/",
             "system_id": "ikewai-annotated-data"
         }
     ]
