@@ -91,7 +91,7 @@ def main():
     res.raise_for_status()
     ds_end = res.json()[1]
     #start processing at the next day
-    start_date = datetime.fromisoformat(ds_end).date() + timedelta(days = 1)
+    start_date = datetime.strptime(ds_end, "%Y-%m-%dT%H:%M:%S.%fZ").date() + timedelta(days = 1)
 
     #set the last day to the passed date
     #default to yesterday if no date provided
